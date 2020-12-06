@@ -10,10 +10,8 @@ namespace Day5
         static void Main()
         {
             List<BinarySeat> seats = new List<BinarySeat>();
-            var stream = File.Open("Input.txt", FileMode.Open);
-            var reader = new StreamReader(stream);
-            string line;
-            while ((line = reader.ReadLine()) != null)
+            var inputLines = File.ReadAllLines("Input.txt").Select(x => x.Trim());
+            foreach (var line in inputLines)
             {
                 seats.Add(new BinarySeat(line));
             }
