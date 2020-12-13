@@ -20,7 +20,8 @@ namespace Day12.Tests
 
             navigator.ProcessInstructions();
 
-            Assert.AreEqual(25, navigator.Distance);
+            //Assert.AreEqual(25, navigator.Distance);
+            Assert.AreEqual(286, navigator.Distance);
         }
     }
 }

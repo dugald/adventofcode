@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,15 +11,18 @@ namespace Day12
         private char[] Directions = {'N', 'E', 'S', 'W'};
         private char[] Turns = {'L', 'R'};
 
-        private int currentLocationPointer;
-        private Dictionary<char,int> CurrentDistances = new Dictionary<char, int> {{'N', 0}, {'E', 0}, {'S', 0}, {'W', 0}};
+        private int currentDirectionPointer;
+        private Dictionary<char, int> CurrentDistances = new Dictionary<char, int> { { 'N', 0 }, { 'E', 0 }, { 'S', 0 }, { 'W', 0 } };
+        private Dictionary<char, int> WaypointLocation = new Dictionary<char, int> { { 'N', 0 }, { 'E', 0 }, { 'S', 0 }, { 'W', 0 } };
 
         private List<Instruction> InstructionSet { get; set; }
 
         public Navigator(string[] input)
         {
             InstructionSet = new List<Instruction>();
-            currentLocationPointer = 1;
+            currentDirectionPointer = 1;
+            WaypointLocation['E'] = 10;
+            WaypointLocation['N'] = 1;
             foreach (var line in input)
             {
                 InstructionSet.Add(new Instruction(line));
@@ -50,23 +54,46 @@ namespace Day12
 
         private void AddDirection(Instruction instruction)
         {
-            CurrentDistances[instruction.Action] += instruction.Quantity;
+            // Part 1
+            //CurrentDistances[instruction.Action] += instruction.Quantity;
+
+            WaypointLocation[instruction.Action] += instruction.Quantity;
         }
 
         private void Turn(Instruction instruction)
         {
-            currentLocationPointer = instruction.Action == 'R'
-                ? (currentLocationPointer + instruction.Quantity / 90) % Directions.Length
-                : (currentLocationPointer + Directions.Length - instruction.Quantity / 90) % Directions.Length;
+            // Part 1
+            //currentDirectionPointer = instruction.Action == 'R'
+            //    ? (currentDirectionPointer + instruction.Quantity / 90) % Directions.Length
+            //    : (currentDirectionPointer + Directions.Length - instruction.Quantity / 90) % Directions.Length;
+
+            // Move the waypoint around the ship
+            var turns = instruction.Action == 'R' ? instruction.Quantity / 90 : 4 - instruction.Quantity / 90;
+            for (int i = 0; i < turns; i++)
+            {
+                var temp = WaypointLocation['N'];
+                WaypointLocation['N'] = WaypointLocation['W'];
+                WaypointLocation['W'] = WaypointLocation['S'];
+                WaypointLocation['S'] = WaypointLocation['E'];
+                WaypointLocation['E'] = temp;
+            }
         }
 
         private void HandleForwardReverse(Instruction instruction)
         {
-            if (instruction.Action == 'F')
-                CurrentDistances[Directions[currentLocationPointer]] += instruction.Quantity;
-            else
+            // Part 1
+            //if (instruction.Action == 'F')
+            //    CurrentDistances[Directions[currentDirectionPointer]] += instruction.Quantity;
+            //else
+            //{
+            //    CurrentDistances[Directions[currentDirectionPointer]] -= instruction.Quantity;
+            //}
+            if (instruction.Action == 'R')
+                instruction.Quantity = -instruction.Quantity;
+
+            foreach (char direction in Directions)
             {
-                CurrentDistances[Directions[currentLocationPointer]] -= instruction.Quantity;
+                CurrentDistances[direction] += instruction.Quantity * WaypointLocation[direction];
             }
         }
     }
